@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: taxi_seniran
+      POSTGRES_USER: taxi
+      POSTGRES_PASSWORD: change_me
+    volumes:
+      - taxi_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taxi -d taxi_seniran"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://taxi:change_me@db:5432/taxi_seniran
+      JWT_SECRET_KEY: change_this_in_production
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+
+volumes:
+  taxi_db:
