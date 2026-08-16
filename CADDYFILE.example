@@ -1,3 +1,0 @@
-api.taxi-seniran.sn {
-    reverse_proxy api:5000
-}
